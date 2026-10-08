@@ -2,45 +2,42 @@ import { Link } from "react-router-dom";
 
 export default function HOME() {
   return (
-    <main>
+    <main className="home-page">
 
-      <section className="hero">
+      <section className="hero-section">
 
         <div className="hero-content">
 
-          <p className="hero-label">
+          <p className="section-label">
             APARTMENT MANAGEMENT SYSTEM
           </p>
 
           <h1>
-            MANAGE.
+            MANAGE YOUR
             <br />
-            CONNECT.
-            <br />
-            <span>SIMPLIFY.</span>
+            COMMUNITY.
           </h1>
 
           <p className="hero-description">
-            A simple apartment management system
-            designed to manage residents,
+            A simple platform to manage residents,
             maintenance requests, notices and
-            community facilities in one place.
+            apartment facilities.
           </p>
 
           <div className="hero-buttons">
 
             <Link
               to="/residents"
-              className="primary-button"
+              className="hero-button"
             >
-              Manage Residents
+              MANAGE RESIDENTS
             </Link>
 
             <Link
-              to="/notices"
-              className="secondary-button"
+              to="/maintenance"
+              className="hero-button secondary"
             >
-              View Notices
+              MAINTENANCE
             </Link>
 
           </div>
@@ -49,112 +46,39 @@ export default function HOME() {
 
       </section>
 
+      <section className="home-features">
 
-      <section className="info-section">
+        <div className="feature-card">
+          <h2>Residents</h2>
 
-        <div className="section-heading">
-
-          <p className="section-label">
-            OUR SERVICES
+          <p>
+            Add and manage apartment resident
+            information.
           </p>
-
-          <h2>
-            Everything your community needs.
-          </h2>
-
         </div>
 
+        <div className="feature-card">
+          <h2>Maintenance</h2>
 
-        <div className="info-grid">
+          <p>
+            Submit and track maintenance requests.
+          </p>
+        </div>
 
-          <div className="info-card">
+        <div className="feature-card">
+          <h2>Notices</h2>
 
-            <div className="card-number">
-              01
-            </div>
+          <p>
+            Create important community notices.
+          </p>
+        </div>
 
-            <h3>
-              Residents
-            </h3>
+        <div className="feature-card">
+          <h2>Facilities</h2>
 
-            <p>
-              Manage resident information,
-              apartment numbers and contact
-              details efficiently.
-            </p>
-
-            <Link to="/residents">
-              View Residents →
-            </Link>
-
-          </div>
-
-
-          <div className="info-card">
-
-            <div className="card-number">
-              02
-            </div>
-
-            <h3>
-              Maintenance
-            </h3>
-
-            <p>
-              Report and track maintenance
-              requests raised by residents.
-            </p>
-
-            <Link to="/maintenance">
-              View Requests →
-            </Link>
-
-          </div>
-
-
-          <div className="info-card">
-
-            <div className="card-number">
-              03
-            </div>
-
-            <h3>
-              Notices
-            </h3>
-
-            <p>
-              Keep residents updated with
-              important community announcements.
-            </p>
-
-            <Link to="/notices">
-              View Notices →
-            </Link>
-
-          </div>
-
-
-          <div className="info-card">
-
-            <div className="card-number">
-              04
-            </div>
-
-            <h3>
-              Facilities
-            </h3>
-
-            <p>
-              View and manage facilities available
-              within the residential community.
-            </p>
-
-            <Link to="/facilities">
-              View Facilities →
-            </Link>
-
-          </div>
-
+          <p>
+            View available apartment facilities.
+          </p>
         </div>
 
       </section>

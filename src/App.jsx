@@ -7,16 +7,15 @@ import {
 import NAV from "./Components/NAV";
 
 import HOME from "./Pages/HOME";
-import Notices from "./Pages/notices";
+import SIGNUP from "./Pages/SIGNUP";
+import LOGIN from "./Pages/LOGIN";
 import Residents from "./Pages/Residents";
 import Maintenance from "./Pages/Maintenance";
+import Notices from "./Pages/notices";
 import Facilities from "./Pages/Facilities";
 
-
 export default function App() {
-
   return (
-
     <BrowserRouter>
 
       <NAV />
@@ -26,6 +25,16 @@ export default function App() {
         <Route
           path="/"
           element={<HOME />}
+        />
+
+        <Route
+          path="/signup"
+          element={<SIGNUP />}
+        />
+
+        <Route
+          path="/login"
+          element={<LOGIN />}
         />
 
         <Route
@@ -51,6 +60,5 @@ export default function App() {
       </Routes>
 
     </BrowserRouter>
-
   );
 }

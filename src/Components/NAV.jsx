@@ -1,6 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function NAV() {
+  const navigate = useNavigate();
+
+  const isLoggedIn =
+    localStorage.getItem("isLoggedIn") === "true";
+
+  function handleLogout() {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("currentUser");
+
+    alert("You have been logged out.");
+
+    navigate("/login");
+
+    window.location.reload();
+  }
+
   return (
     <nav className="navbar">
 
@@ -29,6 +45,33 @@ export default function NAV() {
         <Link to="/facilities">
           Facilities
         </Link>
+
+        {!isLoggedIn && (
+          <>
+            <Link
+              to="/login"
+              className="login-nav"
+            >
+              LOGIN
+            </Link>
+
+            <Link
+              to="/signup"
+              className="signup-nav"
+            >
+              SIGNUP
+            </Link>
+          </>
+        )}
+
+        {isLoggedIn && (
+          <button
+            onClick={handleLogout}
+            className="logout-button"
+          >
+            LOGOUT
+          </button>
+        )}
 
       </div>
 

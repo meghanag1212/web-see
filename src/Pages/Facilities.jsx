@@ -1,40 +1,81 @@
-const facilities = [
-  {
-    name: "Swimming Pool",
-    description:
-      "A community swimming pool available for residents."
-  },
-  {
-    name: "Gymnasium",
-    description:
-      "Fitness facilities for residents to maintain a healthy lifestyle."
-  },
-  {
-    name: "Clubhouse",
-    description:
-      "A common area for community gatherings and events."
-  },
-  {
-    name: "Children's Play Area",
-    description:
-      "A safe recreational space for children."
-  },
-  {
-    name: "Parking Area",
-    description:
-      "Dedicated parking space for residents and visitors."
-  },
-  {
-    name: "Community Hall",
-    description:
-      "A multipurpose hall for meetings and celebrations."
-  }
-];
+import { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
 
 export default function Facilities() {
 
-  return (
+  const [name, setName] = useState("");
+  const [description, setDescription] =
+    useState("");
 
+  const [status, setStatus] =
+    useState("Available");
+
+  const [facilities, setFacilities] =
+    useState([]);
+
+  useEffect(() => {
+    fetchFacilities();
+  }, []);
+
+  async function fetchFacilities() {
+
+    const { data, error } = await supabase
+      .from("facilities")
+      .select("*")
+      .order("id", {
+        ascending: true
+      });
+
+    if (error) {
+      console.error(error);
+      alert("Unable to load facilities.");
+      return;
+    }
+
+    setFacilities(data || []);
+  }
+
+  async function handleSubmit(e) {
+
+    e.preventDefault();
+
+    if (!name || !description) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("facilities")
+      .insert([
+        {
+          name: name,
+          description: description,
+          status: status
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.error(error);
+      alert("Error: " + error.message);
+      return;
+    }
+
+    setFacilities([
+      ...facilities,
+      ...data
+    ]);
+
+    setName("");
+    setDescription("");
+    setStatus("Available");
+
+    alert(
+      "Facility added successfully!"
+    );
+  }
+
+  return (
     <main className="management-page">
 
       <div className="page-heading">
@@ -48,37 +89,143 @@ export default function Facilities() {
         </h1>
 
         <p>
-          Explore the facilities available in
-          your residential community.
+          Manage facilities available
+          to apartment residents.
         </p>
 
       </div>
 
+      <div className="management-grid">
 
-      <div className="facility-grid">
+        <div className="form-card">
 
-        {facilities.map((facility) => (
+          <h2>
+            Add Facility
+          </h2>
 
-          <div
-            className="facility-card"
-            key={facility.name}
+          <form
+            onSubmit={handleSubmit}
+            className="management-form"
           >
 
-            <h2>
-              {facility.name}
-            </h2>
+            <div className="input-group">
 
-            <p>
-              {facility.description}
-            </p>
+              <label>
+                Facility Name
+              </label>
 
-            <button className="facility-button">
-              Available
+              <input
+                type="text"
+                placeholder="Example: Swimming Pool"
+                value={name}
+                onChange={(e) =>
+                  setName(e.target.value)
+                }
+              />
+
+            </div>
+
+            <div className="input-group">
+
+              <label>
+                Description
+              </label>
+
+              <textarea
+                rows="5"
+                placeholder="Describe the facility"
+                value={description}
+                onChange={(e) =>
+                  setDescription(
+                    e.target.value
+                  )
+                }
+              />
+
+            </div>
+
+            <div className="input-group">
+
+              <label>
+                Status
+              </label>
+
+              <select
+                value={status}
+                onChange={(e) =>
+                  setStatus(
+                    e.target.value
+                  )
+                }
+              >
+
+                <option value="Available">
+                  Available
+                </option>
+
+                <option value="Unavailable">
+                  Unavailable
+                </option>
+
+                <option value="Maintenance">
+                  Maintenance
+                </option>
+
+              </select>
+
+            </div>
+
+            <button type="submit">
+              Add Facility
             </button>
 
-          </div>
+          </form>
 
-        ))}
+        </div>
+
+        <div className="list-card">
+
+          <h2>
+            Available Facilities
+          </h2>
+
+          {facilities.length === 0 ? (
+
+            <p>
+              No facilities available.
+            </p>
+
+          ) : (
+
+            facilities.map((facility) => (
+
+              <div
+                className="data-card"
+                key={facility.id}
+              >
+
+                <h3>
+                  {facility.name}
+                </h3>
+
+                <p>
+                  {facility.description}
+                </p>
+
+                <p>
+                  <strong>
+                    Status:
+                  </strong>{" "}
+                  {facility.status}
+                </p>
+
+              </div>
+
+            ))
+
+          )}
+
+        </div>
 
       </div>
 

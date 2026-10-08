@@ -1,18 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
 
 export default function Maintenance() {
-
-  const [requests, setRequests] = useState(() => {
-    return JSON.parse(
-      localStorage.getItem("maintenanceRequests")
-    ) || [];
-  });
 
   const [resident, setResident] = useState("");
   const [apartment, setApartment] = useState("");
   const [issue, setIssue] = useState("");
 
-  function submitRequest(e) {
+  const [requests, setRequests] = useState([]);
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  async function fetchRequests() {
+
+    const { data, error } = await supabase
+      .from("maintenance_requests")
+      .select("*")
+      .order("id", {
+        ascending: false
+      });
+
+    if (error) {
+      console.error(error);
+      alert("Unable to load maintenance requests.");
+      return;
+    }
+
+    setRequests(data || []);
+  }
+
+  async function handleSubmit(e) {
 
     e.preventDefault();
 
@@ -21,33 +40,39 @@ export default function Maintenance() {
       return;
     }
 
-    const newRequest = {
-      id: Date.now(),
-      resident,
-      apartment,
-      issue,
-      status: "Pending"
-    };
+    const { data, error } = await supabase
+      .from("maintenance_requests")
+      .insert([
+        {
+          resident_name: resident,
+          apartment: apartment,
+          issue: issue,
+          status: "Pending"
+        }
+      ])
+      .select();
 
-    const updatedRequests = [
-      newRequest,
+    if (error) {
+      console.error(error);
+      alert("Error: " + error.message);
+      return;
+    }
+
+    setRequests([
+      ...data,
       ...requests
-    ];
-
-    setRequests(updatedRequests);
-
-    localStorage.setItem(
-      "maintenanceRequests",
-      JSON.stringify(updatedRequests)
-    );
+    ]);
 
     setResident("");
     setApartment("");
     setIssue("");
+
+    alert(
+      "Maintenance request submitted!"
+    );
   }
 
   return (
-
     <main className="management-page">
 
       <div className="page-heading">
@@ -61,21 +86,24 @@ export default function Maintenance() {
         </h1>
 
         <p>
-          Report and track maintenance requests.
+          Report and track apartment
+          maintenance problems.
         </p>
 
       </div>
-
 
       <div className="management-grid">
 
         <div className="form-card">
 
           <h2>
-            New Request
+            Submit Request
           </h2>
 
-          <form onSubmit={submitRequest}>
+          <form
+            onSubmit={handleSubmit}
+            className="management-form"
+          >
 
             <div className="input-group">
 
@@ -88,12 +116,13 @@ export default function Maintenance() {
                 placeholder="Enter resident name"
                 value={resident}
                 onChange={(e) =>
-                  setResident(e.target.value)
+                  setResident(
+                    e.target.value
+                  )
                 }
               />
 
             </div>
-
 
             <div className="input-group">
 
@@ -103,45 +132,43 @@ export default function Maintenance() {
 
               <input
                 type="text"
-                placeholder="Example: B-302"
+                placeholder="Enter apartment number"
                 value={apartment}
                 onChange={(e) =>
-                  setApartment(e.target.value)
+                  setApartment(
+                    e.target.value
+                  )
                 }
               />
 
             </div>
 
-
             <div className="input-group">
 
               <label>
-                Maintenance Issue
+                Describe the Issue
               </label>
 
               <textarea
                 rows="5"
-                placeholder="Describe the problem..."
+                placeholder="Describe the maintenance issue"
                 value={issue}
                 onChange={(e) =>
-                  setIssue(e.target.value)
+                  setIssue(
+                    e.target.value
+                  )
                 }
-              ></textarea>
+              />
 
             </div>
 
-
-            <button
-              type="submit"
-              className="submit-button"
-            >
+            <button type="submit">
               Submit Request
             </button>
 
           </form>
 
         </div>
-
 
         <div className="list-card">
 
@@ -151,50 +178,47 @@ export default function Maintenance() {
 
           {requests.length === 0 ? (
 
-            <div className="empty-state">
-
-              <p>
-                No maintenance requests yet.
-              </p>
-
-            </div>
+            <p>
+              No maintenance requests yet.
+            </p>
 
           ) : (
 
-            <div className="resident-list">
+            requests.map((request) => (
 
-              {requests.map((request) => (
+              <div
+                className="data-card"
+                key={request.id}
+              >
 
-                <div
-                  className="resident-item"
-                  key={request.id}
-                >
+                <h3>
+                  {request.issue}
+                </h3>
 
-                  <div>
+                <p>
+                  <strong>
+                    Resident:
+                  </strong>{" "}
+                  {request.resident_name}
+                </p>
 
-                    <h3>
-                      {request.issue}
-                    </h3>
+                <p>
+                  <strong>
+                    Apartment:
+                  </strong>{" "}
+                  {request.apartment}
+                </p>
 
-                    <p>
-                      Resident: {request.resident}
-                    </p>
+                <p>
+                  <strong>
+                    Status:
+                  </strong>{" "}
+                  {request.status}
+                </p>
 
-                    <p>
-                      Apartment: {request.apartment}
-                    </p>
+              </div>
 
-                    <p className="status">
-                      Status: {request.status}
-                    </p>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
+            ))
 
           )}
 
