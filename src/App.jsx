@@ -11,6 +11,8 @@ import Notices from "./Pages/notices";
 import Residents from "./Pages/Residents";
 import Maintenance from "./Pages/Maintenance";
 import Facilities from "./Pages/Facilities";
+import LOGIN from "./Pages/LOGIN";
+import SIGNUP from "./Pages/SIGNUP";
 
 
 export default function App() {
@@ -28,20 +30,36 @@ export default function App() {
           element={<HOME />}
         />
 
+
+        <Route
+          path="/login"
+          element={<LOGIN />}
+        />
+
+
+        <Route
+          path="/signup"
+          element={<SIGNUP />}
+        />
+
+
         <Route
           path="/residents"
           element={<Residents />}
         />
+
 
         <Route
           path="/maintenance"
           element={<Maintenance />}
         />
 
+
         <Route
           path="/notices"
           element={<Notices />}
         />
+
 
         <Route
           path="/facilities"
@@ -53,4 +71,5 @@ export default function App() {
     </BrowserRouter>
 
   );
+
 }

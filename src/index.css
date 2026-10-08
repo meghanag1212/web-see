@@ -456,3 +456,168 @@ textarea {
   }
 
 }
+/* LOGIN PAGE */
+
+.login-page {
+  min-height: calc(100vh - 78px);
+  padding: 70px 7%;
+  display: flex;
+  align-items: center;
+  background: #f5f5f2;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.login-left {
+  max-width: 600px;
+}
+
+.login-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+}
+
+.login-left h1 {
+  font-size: clamp(60px, 8vw, 100px);
+  line-height: 0.9;
+  letter-spacing: -5px;
+  margin-bottom: 30px;
+}
+
+.login-left p:last-child {
+  max-width: 520px;
+  color: #666;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.login-card {
+  background: white;
+  padding: 45px;
+  border: 1px solid #dedede;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+}
+
+.login-card h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
+}
+
+.login-subtitle {
+  color: #777;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 35px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  background: #111;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-button:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+.login-nav {
+  background: #c8ff39;
+  color: #111 !important;
+  padding: 10px 16px;
+  font-weight: 700;
+}
+
+.login-nav:hover {
+  color: #111 !important;
+  background: #b8ed30;
+}
+
+
+/* LOGIN RESPONSIVE */
+
+@media (max-width: 800px) {
+
+  .login-page {
+    padding: 50px 5%;
+  }
+
+  .login-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .login-left h1 {
+    font-size: 60px;
+  }
+
+  .login-card {
+    padding: 30px;
+  }
+
+}
+/* SIGNUP LINK */
+
+.account-link {
+  text-align: center;
+  margin-top: 25px;
+  color: #777;
+  font-size: 14px;
+}
+
+.account-link a {
+  color: #111;
+  font-weight: 700;
+}
+
+.account-link a:hover {
+  color: #777;
+}
+
+
+/* SIGNUP NAVIGATION */
+
+.signup-nav {
+  border: 1px solid #c8ff39;
+  padding: 9px 15px;
+  font-weight: 700;
+}
+
+.signup-nav:hover {
+  background: #c8ff39;
+  color: #111 !important;
+}
+
+
+/* LOGOUT BUTTON */
+
+.logout-button {
+  border: none;
+  background: #c8ff39;
+  color: #111;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout-button:hover {
+  background: #b8ed30;
+  transform: translateY(-2px);
+}
