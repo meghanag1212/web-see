@@ -2,69 +2,54 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
-export default function SIGNUP() {
+export default function LOGIN() {
   const navigate = useNavigate();
 
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
-  async function handleSignup(e) {
+  async function handleLogin(e) {
     e.preventDefault();
 
-    if (!name || !email || !password || !confirmPassword) {
-      alert("Please fill all fields.");
+    // Check if fields are empty
+    if (!email || !password) {
+      alert("Please enter your email and password.");
       return;
     }
 
-    if (password.length < 6) {
-      alert("Password must contain at least 6 characters.");
-      return;
-    }
+    // Login with Supabase
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password
+      });
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    // Create account in Supabase Authentication
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password: password
-    });
-
+    // If login fails
     if (error) {
-      alert(error.message);
+      alert("Invalid email or password.");
+      console.log(error.message);
       return;
     }
 
-    // Save additional user information
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert([
-          {
-            id: data.user.id,
-            full_name: name.trim()
-          }
-        ]);
-
-      if (profileError) {
-        alert(profileError.message);
-        return;
-      }
+    // Make sure user exists
+    if (!data.user) {
+      alert("Login failed. Please try again.");
+      return;
     }
 
-    alert("Account created successfully!");
+    // Login successful
+    alert("Login successful!");
 
-    navigate("/login");
+    // Go to Home page
+    navigate("/");
   }
 
   return (
     <main className="login-page">
 
       <div className="login-container">
+
+        {/* LEFT SIDE */}
 
         <div className="login-left">
 
@@ -73,47 +58,40 @@ export default function SIGNUP() {
           </p>
 
           <h1>
-            CREATE
+            WELCOME
             <br />
-            ACCOUNT.
+            BACK.
           </h1>
 
           <p>
-            Create your account to manage
-            residents, maintenance requests,
-            notices and community facilities.
+            Login to manage your residential
+            community, residents, maintenance
+            requests, notices and facilities.
           </p>
 
         </div>
 
+
+        {/* LOGIN FORM */}
+
         <div className="login-card">
 
-          <h2>SIGNUP</h2>
+          <h2>LOGIN</h2>
 
           <p className="login-subtitle">
-            Create a new account to get started.
+            Sign in to access your community dashboard.
           </p>
 
-          <form onSubmit={handleSignup}>
+
+          <form onSubmit={handleLogin}>
+
+            {/* EMAIL */}
 
             <div className="input-group">
 
-              <label>Full Name</label>
-
-              <input
-                type="text"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) =>
-                  setName(e.target.value)
-                }
-              />
-
-            </div>
-
-            <div className="input-group">
-
-              <label>Email Address</label>
+              <label>
+                Email Address
+              </label>
 
               <input
                 type="email"
@@ -126,13 +104,18 @@ export default function SIGNUP() {
 
             </div>
 
+
+            {/* PASSWORD */}
+
             <div className="input-group">
 
-              <label>Password</label>
+              <label>
+                Password
+              </label>
 
               <input
                 type="password"
-                placeholder="Create a password"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) =>
                   setPassword(e.target.value)
@@ -141,36 +124,29 @@ export default function SIGNUP() {
 
             </div>
 
-            <div className="input-group">
 
-              <label>Confirm Password</label>
-
-              <input
-                type="password"
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChange={(e) =>
-                  setConfirmPassword(e.target.value)
-                }
-              />
-
-            </div>
+            {/* LOGIN BUTTON */}
 
             <button
               type="submit"
               className="login-button"
             >
-              CREATE ACCOUNT
+              LOGIN
             </button>
 
           </form>
 
-          <p className="account-link">
-            Already have an account?{" "}
 
-            <Link to="/login">
-              LOGIN
+          {/* SIGNUP LINK */}
+
+          <p className="account-link">
+
+            Don't have an account?{" "}
+
+            <Link to="/signup">
+              SIGNUP
             </Link>
+
           </p>
 
         </div>
