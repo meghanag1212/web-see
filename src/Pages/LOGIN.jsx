@@ -1,48 +1,64 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 
-export default function LOGIN() {
+export default function SIGNUP() {
   const navigate = useNavigate();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  function handleLogin(e) {
+  async function handleSignup(e) {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please enter your email and password.");
+    if (!name || !email || !password || !confirmPassword) {
+      alert("Please fill all fields.");
       return;
     }
 
-    const users =
-      JSON.parse(localStorage.getItem("users")) || [];
-
-    const user = users.find(
-      (user) =>
-        user.email.toLowerCase() === email.toLowerCase() &&
-        user.password === password
-    );
-
-    if (!user) {
-      alert(
-        "Invalid email or password. Please create an account first."
-      );
+    if (password.length < 6) {
+      alert("Password must contain at least 6 characters.");
       return;
     }
 
-    localStorage.setItem("isLoggedIn", "true");
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
 
-    localStorage.setItem(
-      "currentUser",
-      JSON.stringify(user)
-    );
+    // Create account in Supabase Authentication
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password: password
+    });
 
-    alert("Login successful!");
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
-    navigate("/");
+    // Save additional user information
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            id: data.user.id,
+            full_name: name.trim()
+          }
+        ]);
 
-    window.location.reload();
+      if (profileError) {
+        alert(profileError.message);
+        return;
+      }
+    }
+
+    alert("Account created successfully!");
+
+    navigate("/login");
   }
 
   return (
@@ -57,28 +73,43 @@ export default function LOGIN() {
           </p>
 
           <h1>
-            WELCOME
+            CREATE
             <br />
-            BACK.
+            ACCOUNT.
           </h1>
 
           <p>
-            Login to manage your residential
-            community, residents, maintenance
-            requests, notices and facilities.
+            Create your account to manage
+            residents, maintenance requests,
+            notices and community facilities.
           </p>
 
         </div>
 
         <div className="login-card">
 
-          <h2>LOGIN</h2>
+          <h2>SIGNUP</h2>
 
           <p className="login-subtitle">
-            Sign in to access your community dashboard.
+            Create a new account to get started.
           </p>
 
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSignup}>
+
+            <div className="input-group">
+
+              <label>Full Name</label>
+
+              <input
+                type="text"
+                placeholder="Enter your full name"
+                value={name}
+                onChange={(e) =>
+                  setName(e.target.value)
+                }
+              />
+
+            </div>
 
             <div className="input-group">
 
@@ -101,10 +132,25 @@ export default function LOGIN() {
 
               <input
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Create a password"
                 value={password}
                 onChange={(e) =>
                   setPassword(e.target.value)
+                }
+              />
+
+            </div>
+
+            <div className="input-group">
+
+              <label>Confirm Password</label>
+
+              <input
+                type="password"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) =>
+                  setConfirmPassword(e.target.value)
                 }
               />
 
@@ -114,16 +160,16 @@ export default function LOGIN() {
               type="submit"
               className="login-button"
             >
-              LOGIN
+              CREATE ACCOUNT
             </button>
 
           </form>
 
           <p className="account-link">
-            Don't have an account?{" "}
+            Already have an account?{" "}
 
-            <Link to="/signup">
-              SIGNUP
+            <Link to="/login">
+              LOGIN
             </Link>
           </p>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 
 export default function SIGNUP() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export default function SIGNUP() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  function handleSignup(e) {
+  async function handleSignup(e) {
     e.preventDefault();
 
     if (!name || !email || !password || !confirmPassword) {
@@ -27,33 +28,33 @@ export default function SIGNUP() {
       return;
     }
 
-    const existingUsers =
-      JSON.parse(localStorage.getItem("users")) || [];
+    // Create account in Supabase Authentication
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password: password
+    });
 
-    const userAlreadyExists = existingUsers.some(
-      (user) =>
-        user.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (userAlreadyExists) {
-      alert("An account with this email already exists.");
+    if (error) {
+      alert(error.message);
       return;
     }
 
-    const newUser = {
-      id: Date.now(),
-      name: name,
-      email: email,
-      password: password
-    };
+    // Save additional user information
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            id: data.user.id,
+            full_name: name.trim()
+          }
+        ]);
 
-    localStorage.setItem(
-      "users",
-      JSON.stringify([
-        ...existingUsers,
-        newUser
-      ])
-    );
+      if (profileError) {
+        alert(profileError.message);
+        return;
+      }
+    }
 
     alert("Account created successfully!");
 
