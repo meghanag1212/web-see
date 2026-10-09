@@ -10,64 +10,93 @@ export default function SIGNUP() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
   async function handleSignup(e) {
     e.preventDefault();
 
-    if (!name || !email || !password || !confirmPassword) {
-      alert("Please fill all fields.");
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (
+      !trimmedName ||
+      !trimmedEmail ||
+      !password ||
+      !confirmPassword
+    ) {
+      setErrorMessage("Please fill in all fields.");
       return;
     }
 
     if (password.length < 6) {
-      alert("Password must contain at least 6 characters.");
+      setErrorMessage(
+        "Password must contain at least 6 characters."
+      );
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setErrorMessage("Passwords do not match.");
       return;
     }
 
-    // Create account in Supabase Authentication
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password: password
-    });
+    setLoading(true);
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: trimmedEmail,
+        password,
+        options: {
+          data: {
+            full_name: trimmedName,
+          },
+        },
+      });
 
-    // Save additional user information
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert([
-          {
-            id: data.user.id,
-            full_name: name.trim()
-          }
-        ]);
-
-      if (profileError) {
-        alert(profileError.message);
+      if (error) {
+        setErrorMessage(error.message);
         return;
       }
+
+      if (!data.user) {
+        setErrorMessage(
+          "Account creation failed. Please try again."
+        );
+        return;
+      }
+
+      if (data.session) {
+        // Signup returned an active Supabase session.
+        // The protected route can now recognize the user.
+        navigate("/", { replace: true });
+      } else {
+        // Email confirmation is enabled in Supabase.
+        setSuccessMessage(
+          "Your account has been created. Please check your email and confirm your account before logging in."
+        );
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+
+      setErrorMessage(
+        "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    alert("Account created successfully!");
-
-    navigate("/login");
   }
 
   return (
     <main className="login-page">
-
       <div className="login-container">
 
+        {/* LEFT SIDE */}
         <div className="login-left">
-
           <p className="login-label">
             APARTMENT MANAGEMENT SYSTEM
           </p>
@@ -83,11 +112,10 @@ export default function SIGNUP() {
             residents, maintenance requests,
             notices and community facilities.
           </p>
-
         </div>
 
+        {/* SIGNUP FORM */}
         <div className="login-card">
-
           <h2>SIGNUP</h2>
 
           <p className="login-subtitle">
@@ -95,88 +123,111 @@ export default function SIGNUP() {
           </p>
 
           <form onSubmit={handleSignup}>
-
             <div className="input-group">
-
-              <label>Full Name</label>
+              <label htmlFor="signup-name">
+                Full Name
+              </label>
 
               <input
+                id="signup-name"
                 type="text"
                 placeholder="Enter your full name"
                 value={name}
-                onChange={(e) =>
-                  setName(e.target.value)
-                }
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                required
               />
-
             </div>
 
             <div className="input-group">
-
-              <label>Email Address</label>
+              <label htmlFor="signup-email">
+                Email Address
+              </label>
 
               <input
+                id="signup-email"
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
               />
-
             </div>
 
             <div className="input-group">
-
-              <label>Password</label>
+              <label htmlFor="signup-password">
+                Password
+              </label>
 
               <input
+                id="signup-password"
                 type="password"
                 placeholder="Create a password"
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                minLength={6}
+                required
               />
-
             </div>
 
             <div className="input-group">
-
-              <label>Confirm Password</label>
+              <label htmlFor="confirm-password">
+                Confirm Password
+              </label>
 
               <input
+                id="confirm-password"
                 type="password"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) =>
                   setConfirmPassword(e.target.value)
                 }
+                autoComplete="new-password"
+                minLength={6}
+                required
               />
-
             </div>
+
+            {errorMessage && (
+              <p
+                role="alert"
+                className="error-message"
+              >
+                {errorMessage}
+              </p>
+            )}
+
+            {successMessage && (
+              <p
+                role="status"
+                className="success-message"
+              >
+                {successMessage}
+                {" "}
+                <Link to="/login">Go to Login</Link>
+              </p>
+            )}
 
             <button
               type="submit"
               className="login-button"
+              disabled={loading}
             >
-              CREATE ACCOUNT
+              {loading
+                ? "CREATING ACCOUNT..."
+                : "CREATE ACCOUNT"}
             </button>
-
           </form>
 
           <p className="account-link">
             Already have an account?{" "}
-
-            <Link to="/login">
-              LOGIN
-            </Link>
+            <Link to="/login">LOGIN</Link>
           </p>
-
         </div>
-
       </div>
-
     </main>
   );
 }

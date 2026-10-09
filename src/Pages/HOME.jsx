@@ -13,7 +13,7 @@ export default function HOME() {
           </p>
 
           <h1>
-            MANAGE YOUR
+            MANAGE YOUR 
             <br />
             COMMUNITY.
           </h1>
