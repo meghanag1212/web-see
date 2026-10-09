@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "../supabaseClient";
@@ -21,11 +22,11 @@ export default function ProtectedRoute({ children }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (active) {
         setSession(newSession);
       }
-    );
+    });
 
     return () => {
       active = false;
@@ -33,12 +34,10 @@ export default function ProtectedRoute({ children }) {
     };
   }, []);
 
-  // Wait for Supabase to check the session.
   if (session === undefined) {
     return <p>Checking login...</p>;
   }
 
-  // Redirect unauthenticated users to Login.
   if (!session) {
     return (
       <Navigate
@@ -49,6 +48,5 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  // Show the page when the user is authenticated.
   return children;
 }

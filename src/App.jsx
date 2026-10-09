@@ -1,3 +1,4 @@
+
 import {
   BrowserRouter,
   Routes,
@@ -5,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import NAV from "./Components/NAV";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 import HOME from "./Pages/HOME";
 import SIGNUP from "./Pages/SIGNUP";
@@ -17,16 +19,10 @@ import Facilities from "./Pages/Facilities";
 export default function App() {
   return (
     <BrowserRouter>
-
       <NAV />
 
       <Routes>
-
-        <Route
-          path="/"
-          element={<HOME />}
-        />
-
+        {/* Public pages */}
         <Route
           path="/signup"
           element={<SIGNUP />}
@@ -37,28 +33,52 @@ export default function App() {
           element={<LOGIN />}
         />
 
+        {/* Protected pages */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HOME />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/residents"
-          element={<Residents />}
+          element={
+            <ProtectedRoute>
+              <Residents />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/maintenance"
-          element={<Maintenance />}
+          element={
+            <ProtectedRoute>
+              <Maintenance />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/notices"
-          element={<Notices />}
+          element={
+            <ProtectedRoute>
+              <Notices />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/facilities"
-          element={<Facilities />}
+          element={
+            <ProtectedRoute>
+              <Facilities />
+            </ProtectedRoute>
+          }
         />
-
       </Routes>
-
     </BrowserRouter>
   );
 }
